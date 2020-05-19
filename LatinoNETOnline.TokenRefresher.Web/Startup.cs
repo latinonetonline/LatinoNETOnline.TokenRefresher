@@ -1,21 +1,14 @@
 
-using System.Linq;
-using System.Threading.Tasks;
-
 using LatinoNETOnline.TokenRefresher.Web.Extensions;
-using LatinoNETOnline.TokenRefresher.Web.HealthChecks;
+using LatinoNETOnline.TokenRefresher.Web.Services;
+using LatinoNETOnline.TokenRefresher.Web.Services.Interfaces;
 
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace LatinoNETOnline.TokenRefresher.Web
 {
@@ -45,12 +38,17 @@ namespace LatinoNETOnline.TokenRefresher.Web
 
             services.AddFluentMigrator(Configuration);
 
-            services.AddHealthChecks()
-                .AddCheck<PostgresHealthCheck>("Postgres");
+            services.AddHealthChecks(Configuration);
+
+            services.AddApiVersioning(Configuration);
+
+            services.AddSwagger();
+
+            services.AddTransient<ITokenService, TokenService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -61,7 +59,6 @@ namespace LatinoNETOnline.TokenRefresher.Web
 
             app.UseRouting();
 
-
             app.UseAuthentication();
 
             app.UseAuthorization();
@@ -69,27 +66,11 @@ namespace LatinoNETOnline.TokenRefresher.Web
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/health", new HealthCheckOptions()
-                {
-                    ResponseWriter = WriteResponse
-                });
+                endpoints.MapHealthChecks();
             });
-        }
-        private static Task WriteResponse(HttpContext context, HealthReport result)
-        {
-            context.Response.ContentType = "application/json";
 
-            var json = new JObject(
-                new JProperty("status", result.Status.ToString()),
-                new JProperty("results", new JObject(result.Entries.Select(pair =>
-                    new JProperty(pair.Key, new JObject(
-                        new JProperty("status", pair.Value.Status.ToString()),
-                        new JProperty("description", pair.Value.Description),
-                        new JProperty("data", new JObject(pair.Value.Data.Select(
-                            p => new JProperty(p.Key, p.Value))))))))));
+            app.UseSwagger(provider);
 
-            return context.Response.WriteAsync(
-                json.ToString(Formatting.Indented));
         }
     }
 }

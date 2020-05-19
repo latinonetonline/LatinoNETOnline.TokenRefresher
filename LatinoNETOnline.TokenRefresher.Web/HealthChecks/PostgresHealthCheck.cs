@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Dapper;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -25,23 +26,10 @@ namespace LatinoNETOnline.TokenRefresher.Web.HealthChecks
         {
             try
             {
-                //TODO: There is probably a much better way to do this.
-                using (var connection = new NpgsqlConnection(_configuration.GetConnectionString("Default")))
-                {
-                    connection.Open();
-                    using (var command = connection.CreateCommand())
-                    {
-                        command.CommandType = CommandType.Text;
-                        command.CommandText = "SELECT 1";
-                        var result = (int)await command.ExecuteScalarAsync().ConfigureAwait(false);
-                        if (result == 1)
-                        {
-                            return HealthCheckResult.Healthy();
-                        }
+                using var connection = new NpgsqlConnection(_configuration.GetConnectionString("Default"));
+                await connection.QueryAsync("SELECT 1");
 
-                        return HealthCheckResult.Unhealthy();
-                    }
-                }
+                return HealthCheckResult.Healthy();
             }
             catch (Exception ex)
             {
