@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 
@@ -94,10 +95,14 @@ namespace LatinoNETOnline.TokenRefresher.Web.Business
         {
             var tokens = await _tokenService.GetExpireSoon(2400);
 
+            var tasks = new List<Task<Response<Token>>>();
+
             foreach (var token in tokens.Result)
             {
-                await RefreshToken(token);
+                tasks.Add(RefreshToken(token));
             }
+
+            Task.WaitAll(tasks.ToArray());
 
             return new Response
             {
