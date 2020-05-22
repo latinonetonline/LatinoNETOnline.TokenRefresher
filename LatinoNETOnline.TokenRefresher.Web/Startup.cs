@@ -1,4 +1,6 @@
-
+using LatinoNETOnline.TokenRefresher.Web.Authentication.Providers.Mixer;
+using LatinoNETOnline.TokenRefresher.Web.Business;
+using LatinoNETOnline.TokenRefresher.Web.Business.Interfaces;
 using LatinoNETOnline.TokenRefresher.Web.Extensions;
 using LatinoNETOnline.TokenRefresher.Web.Services;
 using LatinoNETOnline.TokenRefresher.Web.Services.Interfaces;
@@ -26,6 +28,11 @@ namespace LatinoNETOnline.TokenRefresher.Web
         {
             services.AddControllers();
 
+            services.AddHttpClient();
+
+            services.AddOptions(Configuration);
+            services.AddRefreshTokenHandlers();
+
             services.AddAuthorization();
 
             services.AddAuthentication("Bearer")
@@ -36,6 +43,10 @@ namespace LatinoNETOnline.TokenRefresher.Web
                     options.RequireHttpsMetadata = false;
                 });
 
+            services.AddAuthentication()
+                .AddCookie()
+                .AddMixerOAuth(Configuration);
+
             services.AddFluentMigrator(Configuration);
 
             services.AddHealthChecks(Configuration);
@@ -45,6 +56,8 @@ namespace LatinoNETOnline.TokenRefresher.Web
             services.AddSwagger();
 
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<ITokenBusiness, TokenBusiness>();
+            services.AddTransient<ITokenBusinessCreate, TokenBusinessCreate>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

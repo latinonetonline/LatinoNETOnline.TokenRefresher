@@ -17,7 +17,10 @@ namespace LatinoNETOnline.TokenRefresher.Web.Migrations
                 .WithColumn(nameof(Token.Expires)).AsDateTime()
                 .WithColumn(nameof(Token.TokenType)).AsString()
                 .WithColumn(nameof(Token.RefreshToken)).AsString()
-                .WithColumn(nameof(Token.ClientId)).AsString().NotNullable();
+                .WithColumn(nameof(Token.ClientId)).AsString().NotNullable()
+                .WithColumn(nameof(Token.Provider)).AsByte().NotNullable()
+                .WithColumn(nameof(Token.ProviderClientId)).AsString().NotNullable()
+                .WithColumn(nameof(Token.ProviderClientSecret)).AsString().NotNullable();
 
             Create.UniqueConstraint("IX_Token_ClientId_Name").OnTable("Tokens").Columns(nameof(Token.ClientId), nameof(Token.Name));
             Create.UniqueConstraint("IX_Token_ClientId_Value").OnTable("Tokens").Columns(nameof(Token.ClientId), nameof(Token.Value));

@@ -2,6 +2,8 @@
 
 using Dapper.Contrib.Extensions;
 
+using LatinoNETOnline.TokenRefresher.Web.Models.Enums;
+
 namespace LatinoNETOnline.TokenRefresher.Web.Entities
 {
     [Table("Tokens")]
@@ -15,5 +17,8 @@ namespace LatinoNETOnline.TokenRefresher.Web.Entities
         public string TokenType { get; set; }
         public string RefreshToken { get; set; }
         public string ClientId { get; set; }
+        public Provider Provider { get; set; }
+        public string ProviderClientId { get; set; }
+        public string ProviderClientSecret { get; set; }
     }
 }

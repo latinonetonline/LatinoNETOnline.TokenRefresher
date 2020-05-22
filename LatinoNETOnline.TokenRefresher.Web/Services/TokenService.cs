@@ -65,8 +65,21 @@ namespace LatinoNETOnline.TokenRefresher.Web.Services
 
         public async Task<Response<Token>> Get(string name, string clientId)
         {
-            var token = await _db.QuerySingleOrDefaultAsync<Token>($"SELECT * FROM \"public\".\"Tokens\" WHERE \"{nameof(Token.Name)}\" = '{name}' AND \"{nameof(Token.ClientId)}\" = '{clientId}'");
+            var token = await _db.QuerySingleOrDefaultAsync<Token>($"SELECT * FROM \"public\".\"Tokens\" WHERE Lower(\"{nameof(Token.Name)}\") = '{name.ToLower()}' AND \"{nameof(Token.ClientId)}\" = '{clientId}'");
             return new Response<Token>(token);
+        }
+
+        public async Task<Response<Token>> GetByNameOrToken(string name, string tokenValue, string clientId)
+        {
+            var token = await _db.QuerySingleOrDefaultAsync<Token>($"SELECT * FROM \"public\".\"Tokens\" WHERE ( \"{nameof(Token.Value)}\" = '{tokenValue}' OR Lower(\"{nameof(Token.Name)}\") = '{name}' ) AND \"{nameof(Token.ClientId)}\" = '{clientId}'");
+            return new Response<Token>(token);
+        }
+
+        public async Task<ResponseEnumerable<Token>> GetExpireSoon(int seconds)
+        {
+            var tokens = await _db.QueryAsync<Token>($"SELECT * FROM \"public\".\"Tokens\" WHERE NOW() + {seconds} * interval '1 second' >= \"Expires\" ");
+
+            return new ResponseEnumerable<Token>(tokens);
         }
     }
 }
