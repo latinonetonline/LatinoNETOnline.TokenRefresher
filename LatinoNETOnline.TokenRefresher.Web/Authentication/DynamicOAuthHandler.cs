@@ -1,6 +1,8 @@
 ﻿using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
+using LatinoNETOnline.TokenRefresher.Web.Entities;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Logging;
@@ -17,8 +19,8 @@ namespace LatinoNETOnline.TokenRefresher.Web.Authentication
 
         protected override async Task<OAuthTokenResponse> ExchangeCodeAsync(OAuthCodeExchangeContext context)
         {
-            Options.ClientId = context.Properties.Items[nameof(OAuthOptions.ClientId)];
-            Options.ClientSecret = context.Properties.Items[nameof(OAuthOptions.ClientSecret)];
+            Options.ClientId = context.Properties.Items[nameof(Token.ProviderClientId)];
+            Options.ClientSecret = context.Properties.Items[nameof(Token.ProviderClientSecret)];
 
             var response = await base.ExchangeCodeAsync(context);
 
@@ -29,8 +31,8 @@ namespace LatinoNETOnline.TokenRefresher.Web.Authentication
         //https://github.com/dotnet/aspnetcore/blob/master/src/Security/Authentication/OAuth/src/OAuthHandler.cs#L263
         protected override string BuildChallengeUrl(AuthenticationProperties properties, string redirectUri)
         {
-            Options.ClientId = properties.Items[nameof(OAuthOptions.ClientId)];
-            Options.ClientSecret = properties.Items[nameof(OAuthOptions.ClientSecret)];
+            Options.ClientId = properties.Items[nameof(Token.ProviderClientId)];
+            Options.ClientSecret = properties.Items[nameof(Token.ProviderClientSecret)];
 
             string url = base.BuildChallengeUrl(properties, redirectUri);
             return url;

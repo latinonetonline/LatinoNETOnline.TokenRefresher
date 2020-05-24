@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using LatinoNETOnline.TokenRefresher.Web.Business.Interfaces;
+using LatinoNETOnline.TokenRefresher.Web.Entities;
 using LatinoNETOnline.TokenRefresher.Web.Models.Enums;
 
 using Microsoft.AspNetCore.Authentication;
@@ -43,11 +44,11 @@ namespace LatinoNETOnline.TokenRefresher.Web.Controllers
 
 
 
-                authenticationProperties.Items.Add(nameof(OAuthOptions.ClientId), clientId);
-                authenticationProperties.Items.Add(nameof(OAuthOptions.ClientSecret), clientSecret);
-                authenticationProperties.Items.Add(nameof(OAuthOptions.SignInScheme), ((int)provider).ToString());
-                authenticationProperties.Items.Add("LatinoNETOnlineClientId", latinoClientId);
-                authenticationProperties.Items.Add("TokenName", tokenName);
+                authenticationProperties.Items.Add(nameof(Token.ProviderClientId), clientId);
+                authenticationProperties.Items.Add(nameof(Token.ProviderClientSecret), clientSecret);
+                authenticationProperties.Items.Add(nameof(Token.Provider), ((int)provider).ToString());
+                authenticationProperties.Items.Add(nameof(Token.ClientId), latinoClientId);
+                authenticationProperties.Items.Add(nameof(Token) + nameof(Token.Name), tokenName);
 
                 return Challenge(authenticationProperties, provider.ToString());
             }

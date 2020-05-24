@@ -23,12 +23,12 @@ namespace LatinoNETOnline.TokenRefresher.Web.Authentication
 
         public override async Task CreatingTicket(OAuthCreatingTicketContext context)
         {
-            var latinoClinetId = context.Properties.Items["LatinoNETOnlineClientId"];
-            var tokenName = context.Properties.Items["TokenName"];
-            var providerClientId = context.Properties.Items[nameof(OAuthOptions.ClientId)];
-            var providerSecret = context.Properties.Items[nameof(OAuthOptions.ClientSecret)];
+            var latinoClinetId = context.Properties.Items[nameof(Token.ClientId)];
+            var tokenName = context.Properties.Items[nameof(Token) + nameof(Token.Name)];
+            var providerClientId = context.Properties.Items[nameof(Token.ProviderClientId)];
+            var providerSecret = context.Properties.Items[nameof(Token.ProviderClientSecret)];
 
-            var provider = (Provider)int.Parse(context.Properties.Items[nameof(OAuthOptions.SignInScheme)]);
+            var provider = (Provider)int.Parse(context.Properties.Items[nameof(Token.Provider)]);
             Response<Token> response = await _tokenBusiness.Create(new Token
             {
                 Expires = DateTime.Now.ToUniversalTime().AddSeconds(context.ExpiresIn.Value.TotalSeconds),
